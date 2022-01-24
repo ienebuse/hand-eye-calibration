@@ -8,7 +8,6 @@ import numpy as np
 from numpy.lib.function_base import append
 from numpy.linalg import inv, det, svd, eig
 # from sim_data import *
-# from data2 import *
 from utility import *
 import time
 from scipy import sparse
@@ -50,11 +49,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     for i in range(N):
         An = noise(A[i], sigmaB, sigmaA)
         Bn = B[i]
-        # An = noise(A[i], sigmaB, sigmaA)
-        # An = A[i] if sigmaA == (0,0) else noiseX2(A[i],sigmaA)
-        # B[i] = B[i] if sigmaB == (0,0) else noiseX(B[i],sigmaB)
-        # An = noiseX2(A[i],sigmaA)
-        # B[i] = noiseX(B[i],sigmaB)
+		
         RA = An[:3,:3]                               # relative rotation of camera between successive movement
         tA = An[:3,3].reshape(3,1)                   # relative translatioon of camera between successive movement
         tA_ = skew(tA)
@@ -82,30 +77,3 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     Hx = Pose(Rx,tX)
 
     return Rx, tX.reshape(3,1), Hx, toc-tic
-
-# _Hx = groundTruth(Hx)
-
-# _,_ = get_system_data()
-
-# tic = time.perf_counter()   # start timer
-
-# Rx,tX,estPose  = calibrate(A,B)
-
-# toc = time.perf_counter()   # stop timer
-
-
-
-# print('\nEstimated pose\n')
-# print(np.matrix(estPose))
-
-# print('\nEstimated pose2\n')
-# print(Pose2(estPose))
-
-# print('\nGround truth pose\n')
-# print(np.matrix(_Hx))
-
-# print("\nComputation time = {}".format(str(1000*(toc - tic ))) + "ms")
-
-# res_norm = residual_norm(A, B, Rx, 100)
-
-# print ("\nResisual norm (100): \n\n{}".format(res_norm))

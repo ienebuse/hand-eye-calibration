@@ -15,26 +15,6 @@ from scipy.sparse.linalg import svds, eigs
 import analysis 
 from scipy.spatial.transform import Rotation as Rot
 
-# def R_2_angle_axis(R):
-#     U = np.array([R[2,1]-R[1,2], R[0,2]-R[2,0], R[1,0]-R[0,1]])
-#     theta = np.arccos(np.round(0.5*(np.trace(R)-1),14))
-#     if(np.isnan(theta)):
-#         theta = 0
-#     u = (1/(2*np.sin(theta)))*U
-#     return u.reshape(3,1), theta
-
-# def R_2_angle_axis2(R):
-#     theta = np.arccos(( R[0,0] + R[1,1] + R[2,2] - 1)/2)
-#     _,v = eig(R)
-#     u = v[:,-1]
-
-#     return u.reshape(3,1), theta
-# def quaternion_2_R(q):
-#     R = np.array([[2*(q[0]*q[0] + q[1]*q[1]) - 1, 2*(q[1]*q[2] - q[0]*q[3]), 2*(q[1]*q[3] + q[0]*q[2])], \
-#                    [2*(q[1]*q[2] + q[0]*q[3]), 2*(q[0]*q[0] + q[2]*q[2]) - 1, 2*(q[2]*q[3] - q[0]*q[1])], \
-#                    [2*(q[1]*q[3] - q[0]*q[2]), 2*(q[2]*q[3] + q[0]*q[1]), 2*(q[0]*q[0] + q[3]*q[3]) - 1]])
-#     return R
-
 def get_Translation(R,RA_I,TA,TB):
     RxTB = np.dot(R,TB[:3,0]).reshape(3,1)
     for i in range(1,int((TB.shape[0])/3)):
@@ -55,9 +35,6 @@ def exp_(w):
 
     return R
 
-# gx = groundTruth(Hx)
-# UX, Theta = R_2_angle_axis(gx[:3,:3])
-
 def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     N = len(A)
     S = None
@@ -71,8 +48,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     for i in range(N):
         An = noise(A[i], sigmaB, sigmaA)
         Bn = B[i]
-        # An = A[i] if sigmaA == (0,0) else noiseX2(A[i],sigmaA)
-        # B[i] = B[i] if sigmaB == (0,0) else noiseX(B[i],sigmaB)
+		
         RA = An[:3,:3]                               # relative rotation of camera between successive movement
         tA = An[:3,3].reshape(3,1)                   # relative translatioon of camera between successive movement
         RB = Bn[:3,:3]                               # relative rotation of robot between successive movement
@@ -111,40 +87,3 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     Hx = Pose(Rx,tX)
 
     return Rx, tX.reshape(3,1), Hx, toc-tic
-
-
-# _,_ = analysis.get_system_data(use_movement=True)
-
-# calibrate(A, B, 0, 0)
-
-# tic = time.perf_counter()   # start timer
-
-# Rx,tX,estPose,_  = calibrate(analysis.A, analysis.B)
-
-# toc = time.perf_counter()   # stop timer
-
-# print("\nRotation Rx\n")
-# print(np.matrix(Rx))
-
-# print("\nTranslation tX\n")
-# print(np.matrix(tX))
-
-# print('\nEstimated pose\n')
-# print(np.matrix(estPose))
-
-# print('\nEstimated pose2\n')
-# print(Pose2(estPose))
-
-# print("\nGround Truth\n")
-# print(np.matrix(groundTruth(Hx)))
-
-# print('\n')
-# print(Pose2(groundTruth(Hx)))
-# print('\n')
-
-
-# print("\nComputation time = {}".format(str(1000*(toc - tic ))) + "ms")
-
-# res_norm = residual_norm(Rx, 100)
-
-# print ("\nResisual norm (100): \n\n{}".format(res_norm))

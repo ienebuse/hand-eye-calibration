@@ -60,11 +60,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     for i in range(N):
         An = noise(A[i], sigmaB, sigmaA)
         Bn = B[i]
-        # An = noise(A[i], sigmaB, sigmaA)
-        # An = A[i] if sigmaA == (0,0) else noiseX2(A[i],sigmaA)
-        # B[i] = B[i] if sigmaB == (0,0) else noiseX(B[i],sigmaB)
-        # An = noiseX2(A[i],sigmaA)
-        # B[i] = noiseX(B[i],sigmaB)
+		
         RA = An[:3,:3]                               # relative rotation of camera between successive movement
         tA = An[:3,3].reshape(3,1)                   # relative translatioon of camera between successive movement
         RB = Bn[:3,:3]                               # relative rotation of robot between successive movement
@@ -120,38 +116,3 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     Hx = Pose(Rx,tX)
 
     return Rx, tX.reshape(3,1), Hx, toc-tic
-
-
-# _,_ = analysis.get_system_data()
-
-# # tic = time.perf_counter()   # start timer
-
-# Rx,tX,estPose  = calibrate(analysis.A, analysis.B, 0, 0)
-
-# # toc = time.perf_counter()   # stop timer
-
-# print("\nRotation Rx\n")
-# print(np.matrix(Rx))
-
-# print("\nTranslation tX\n")
-# print(np.matrix(tX))
-
-# print('\nEstimated pose\n')
-# print(np.matrix(estPose))
-
-# print('\nEstimated pose2\n')
-# print(Pose2(estPose))
-
-# print("\nGround Truth\n")
-# print(np.matrix(groundTruth(Hx)))
-
-# print('\n')
-# print(Pose2(groundTruth(Hx)))
-# print('\n')
-
-
-# print("\nComputation time = {}".format(str(1000*(toc - tic ))) + "ms")
-
-# res_norm = residual_norm(Rx, 100)
-
-# print ("\nResisual norm (100): \n\n{}".format(res_norm))

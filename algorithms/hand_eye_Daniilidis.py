@@ -63,11 +63,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     for i in range(N):
         An = noise(A[i], sigmaB, sigmaA)
         Bn = B[i]
-        # An = noise(A[i], sigmaB, sigmaA)
-        # An = A[i] if sigmaA == (0,0) else noiseX2(A[i],sigmaA)
-        # B[i] = B[i] if sigmaB == (0,0) else noiseX(B[i],sigmaB)
-        # An = noiseX2(A[i],sigmaA)
-        # B[i] = noiseX(B[i],sigmaB)
+		
         RA = An[:3,:3]                               # relative rotation of camera between successive movement
         tA = An[:3,3].reshape(3,1)                   # relative translatioon of camera between successive movement
         RB = Bn[:3,:3]                               # relative rotation of robot between successive movement
@@ -76,9 +72,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
         
         qA = R_2_quaternion(RA).reshape(-1,1)
         qB= R_2_quaternion(RB).reshape(-1,1)
-
-        # qA_ = 0.5*np.dot(e_(tA,-1),qA)
-        # qB_ = 0.5*np.dot(e_(tB,-1),qB)
+		
         qA_ = 0.5*np.dot(e_(qA,1),np.append([[0]],tA,axis=0))
         qB_ = 0.5*np.dot(e_(qB,1),np.append([[0]],tB,axis=0))
 
@@ -110,8 +104,7 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     J = [[a,b,c],[a_,b_,c_]]
     x0 = np.array([0.5,0.5])
     x = optimize.newton(f,x0,maxiter=100000,tol=1.48e-15)
-    # x = optimize.fsolve(f,x0,xtol=1.48e-15)
-    # x = optimize.
+	
 
     qx = x[0]*u1 + x[1]*u2
     qx_ = x[0]*v1 + x[1]*v2
@@ -125,34 +118,3 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     Hx = Pose(Rx,tX)
 
     return Rx, tX.reshape(3,1), Hx, toc-tic
-
-
-# _,_ = analysis.get_system_data()
-
-# # tic = time.perf_counter()   # start timer
-
-# Rx,tX,estPose  = calibrate(analysis.A, analysis.B)
-
-# # toc = time.perf_counter()   # stop timer
-
-# print("\nRotation Rx\n")
-# print(np.matrix(Rx))
-
-# print("\nTranslation tX\n")
-# print(np.matrix(tX))
-
-# print('\nEstimated pose\n')
-# print(np.matrix(estPose))
-
-# print('\nEstimated pose2\n')
-# print(Pose2(estPose))
-
-# print("\nGround Truth\n")
-# print(np.matrix(groundTruth(Hx)))
-
-
-# print("\nComputation time = {}".format(str(1000*(toc - tic ))) + "ms")
-
-# res_norm = residual_norm(Rx, 100)
-
-# print ("\nResisual norm (100): \n\n{}".format(res_norm))

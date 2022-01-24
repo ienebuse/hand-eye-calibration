@@ -23,17 +23,12 @@ def invsqrt(mat):
     return u.dot(np.diag(1.0/np.sqrt(s))).dot(v)
 
 def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
-    #transform pairs A_i, B_i
+
     tic = time.perf_counter()
     N = len(A)
     M = np.zeros((3,3))
     for i in range(N):
         A[i] = noise(A[i], sigmaB, sigmaA)
-        # An = noise(A[i], sigmaB, sigmaA)
-        # An = A[i] if sigmaA == (0,0) else noiseX2(A[i],sigmaA)
-        # B[i] = B[i] if sigmaB == (0,0) else noiseX(B[i],sigmaB)
-        # A[i] = noiseX2(A[i],sigmaA)
-        # B[i] = noiseX(B[i],sigmaB)
 
         Ra, Rb = A[i][0:3, 0:3], B[i][0:3, 0:3]
         M += outer(log(Rb), log(Ra))
@@ -55,29 +50,3 @@ def calibrate(A,B, sigmaA=(0,0), sigmaB=(0,0)):
     Hx = Pose(Rx,tX)
 
     return Rx, tX.reshape(3,1), Hx, toc-tic 
-
-
-# _,_ = get_system_data()
-
-# tic = time.perf_counter()   # start timer
-
-# Rx, tX, estPose = calibrate(A,B)
-
-# toc = time.perf_counter()   # stop timer
-
-# # estPose = Pose(Rx,tX)
-
-# print('\nEstimated pose\n')
-# print(np.matrix(estPose))
-
-# print('\nEstimated pose2\n')
-# print(Pose2(estPose))
-
-# print('\nGround truth pose\n')
-# print(np.matrix(groundTruth(Hx)))
-
-# print("\nComputation time = {}".format(str(1000*(toc - tic ))) + "ms")
-
-# res_norm = residual_norm(A, B, Rx, 100)
-
-# print ("\nResisual norm (100): \n\n{}".format(res_norm))

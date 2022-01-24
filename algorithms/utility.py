@@ -110,13 +110,6 @@ def rot2(z2,y,z1):
     return np.dot(R_z2,np.dot(R_y,R_z1))
 
 def R_2_angle_axis(R):
-    # U = np.array([R[2,1]-R[1,2], R[0,2]-R[2,0], R[1,0]-R[0,1]])
-    # theta = np.arccos(np.round(0.5*(np.trace(R)-1),8))
-    # # theta = np.arccos(0.5*(np.trace(R)-1))
-    # if(np.isnan(theta)):
-    #     theta = 0
-    # u = (1/(2*np.sin(theta)))*U
-    # return u.reshape(3,1), theta
 
     rotvec = Rot.from_matrix(R).as_rotvec()
     theta = norm(rotvec)
@@ -125,13 +118,7 @@ def R_2_angle_axis(R):
     return u.reshape(3,1), theta
 
 def angle_axis_2_R(a,w):
-    # U = np.array([R[2,1]-R[1,2], R[0,2]-R[2,0], R[1,0]-R[0,1]])
-    # theta = np.arccos(np.round(0.5*(np.trace(R)-1),8))
-    # # theta = np.arccos(0.5*(np.trace(R)-1))
-    # if(np.isnan(theta)):
-    #     theta = 0
-    # u = (1/(2*np.sin(theta)))*U
-    # return u.reshape(3,1), theta
+
     rotvec = a*w
     R = Rot.from_rotvec(rotvec.flatten()).as_matrix()
     return R
@@ -152,8 +139,6 @@ def quaternion_2_R(q):
     R = np.array([[2*(q[0]*q[0] + q[1]*q[1]) - 1, 2*(q[1]*q[2] - q[0]*q[3]), 2*(q[1]*q[3] + q[0]*q[2])], \
                    [2*(q[1]*q[2] + q[0]*q[3]), 2*(q[0]*q[0] + q[2]*q[2]) - 1, 2*(q[2]*q[3] - q[0]*q[1])], \
                    [2*(q[1]*q[3] - q[0]*q[2]), 2*(q[2]*q[3] + q[0]*q[1]), 2*(q[0]*q[0] + q[3]*q[3]) - 1]])
-
-    # R = Rot.from_quat(q.flatten()).as_matrix()
 
     return R
 
@@ -254,39 +239,7 @@ def Pose2(Pose1):
     # return np.round(P,6).tolist()
     return P
 
-def noise3(e=0.001,shape=(3,3)):
-    _noise = np.random.normal(0,e,size=shape)
-    return _noise.reshape(shape[0], shape[1])
 
-def noise2(e=0.001,shape=(3,3)):
-    _noise = np.random.rand(shape[0],shape[1])*e
-    return _noise.reshape(shape[0], shape[1])
-
-def noise1(P, n):
-    Hcg = np.array([[-0.995625,     0.068554,    -0.063493,   -89.552823], \
-            [-0.072742,    -0.995152,     0.066188,   -82.510240], \
-            [-0.058647,     0.070517,     0.995785,    14.286884], \
-            [0.000000,     0.000000,     0.000000,     1.000000]])
-    Nce = np.dot(Hcg,np.dot(n,Hcg.T))
-    return Nce
-
-# def noise4(P, sigmaR = 0,sigmaT = 0, N=0):
-#     Hcg = groundTruth(Hx)
-
-#     tP = [np.random.rand()*sigmaT for t in range(3)] + [np.random.rand()*sigmaR for r in range(3)]
-#     # tP = [np.random.normal(0,sigmaT) for t in range(3)] + [np.random.normal(0,sigmaR) for r in range(3)]
-#     Pce = P
-#     if (N is not 0):
-#         Nce = np.dot(Hcg,np.dot(N,inv(Hcg)))    #   noisy movement in A caused by noisy movement in B
-#         Pce = np.dot(P,Nce)                     #   total movement in A with noisy movement 
-#         return Pce
-    
-#     else:
-#         n = H_Pose(tP)
-#         return P,n
-#     # nP = np.dot(Pce,n)
-#     # return nP
-#     # return Pce
 def randSign():
     return 1 if np.random.random() < 0.5 else -1
     # return 1
@@ -298,10 +251,7 @@ def noise(A, sigmaB=(0,0), sigmaA=(0,0),ret_noise=False):
     A_n = A
     if(sigmaB != (0,0)):
         # tP = [np.random.rand()*sigmaB[1]/2 - sigmaB[1] for t in range(3)] + [np.random.rand()*sigmaB[0] - sigmaB[0]/2 for r in range(3)]
-        # tP = [np.random.rand()*sigmaB[1] for t in range(3)] + [np.random.rand()*sigmaB[0] for r in range(3)]
         tP = [np.random.randn()*sigmaB[1] for t in range(3)] + [np.random.randn()*sigmaB[0] for r in range(3)]
-        # tP = [np.random.normal(0,sigmaB[1]) for t in range(3)] + [np.random.normal(0,sigmaB[0]) for r in range(3)]
-        # tP = [randSign()*np.random.beta(2,4)*sigmaB[1] for t in range(3)] + [randSign()*np.random.beta(2,4)*sigmaB[0] for r in range(3)]
         N = H_Pose(tP)
         Nce = np.dot(Hcg,np.dot(N,inv(Hcg)))    #   noisy movement in A caused by noisy movement in B
         # A_n = np.dot(A,Nce)                     #   total movement in A with noisy movement 
@@ -312,10 +262,7 @@ def noise(A, sigmaB=(0,0), sigmaA=(0,0),ret_noise=False):
 
     if(sigmaA != (0,0)):
         ta = [np.random.rand()*sigmaA[1]/2 - sigmaA[1] for t in range(3)] + [np.random.rand()*sigmaA[0] - sigmaA[0]/2 for r in range(3)] 
-        # ta = [np.random.rand()*sigmaA[1] for t in range(3)] + [np.random.rand()*sigmaA[0] for r in range(3)] 
         # ta = [np.random.randn()*sigmaA[1] for t in range(3)] + [np.random.randn()*sigmaA[0] for r in range(3)]
-        # ta = [np.random.normal(0,sigmaA[1]) for t in range(3)] + [np.random.normal(0,sigmaA[0]) for r in range(3)]
-        # ta = [randSign()*np.random.beta(2,4)*sigmaA[1] for t in range(3)] + [randSign()*np.random.beta(2,4)*sigmaA[0] for r in range(3)]
         aN = H_Pose(ta)
         # return np.dot(A_n,aN)
         return np.dot(aN,A_n)
@@ -324,119 +271,4 @@ def noise(A, sigmaB=(0,0), sigmaA=(0,0),ret_noise=False):
     else:
         return A_n
 
-    
 
-def random_pose(uniform_=True,sigma=(0,0)):
-
-    def get_data(lim):
-        x = np.round(np.random.rand()*(lim[1] - lim[0]) + lim[0],6)
-        return x
-
-    
-    if uniform_:
-        rlim = np.random.rand()*sigma[0]# - sigma[0]/2
-        tlim = np.random.rand()*sigma[1]# - sigma[1]/2
-    else:
-        rlim = np.random.randn()*sigma[0]
-        tlim = np.random.randn()*sigma[1]
-
-    tlim = (-np.abs(tlim),np.abs(tlim))
-    rlim = (-np.abs(rlim),np.abs(rlim))
-
-    x = get_data(tlim)
-    ylim = np.sqrt(tlim[1]**2 - x**2)
-    y = get_data((-ylim,ylim))
-    zlim = np.sqrt(tlim[1]**2 - (x**2 + y**2))
-    z = get_data((0.75*zlim,zlim))
-    a = get_data(rlim)
-    blim = np.sqrt(rlim[1]**2 - a**2)
-    b = get_data((-blim,blim))
-    clim = np.sqrt(rlim[1]**2 - (a**2 + b**2))
-    c = get_data((0.75*clim,clim))
-
-    n = [x,y,z,a,b,c]
-
-    return n
-
-
-def noiseQ(A, sigmaB=(0,0), sigmaA=(0,0),ret_noise=False,uniform_=False):
-    Hcg = groundTruth(Hx)
-
-    A_n = A
-    if(sigmaB != (0,0)):
-        tP = [np.random.rand()*sigmaB[1]/2 - sigmaB[1] for t in range(3)] + [np.random.rand()*sigmaB[0] - sigmaB[0]/2 for r in range(3)]
-        # tP = [np.random.rand()*sigmaB[1] for t in range(3)] + [np.random.rand()*sigmaB[0] for r in range(3)]
-        # tP = [np.random.randn()*sigmaB[1] for t in range(3)] + [np.random.randn()*sigmaB[0] for r in range(3)]
-        # tP = [np.random.normal(0,sigmaB[1]) for t in range(3)] + [np.random.normal(0,sigmaB[0]) for r in range(3)]
-        # tP = [randSign()*np.random.beta(2,4)*sigmaB[1] for t in range(3)] + [randSign()*np.random.beta(2,4)*sigmaB[0] for r in range(3)]
-        
-        tP = random_pose(uniform_=uniform_,sigma=sigmaB)
-
-        N = H_Pose(tP)
-        Nce = np.dot(Hcg,np.dot(N,inv(Hcg)))    #   noisy movement in A caused by noisy movement in B
-        # A_n = np.dot(A,Nce)                     #   total movement in A with noisy movement 
-        A_n = np.dot(Nce,A)
-        if(ret_noise):
-            Re = R_2_angle_axis(N[:3,:3])[1]
-            te = norm(N[:,3])
-
-    if(sigmaA != (0,0)):
-        ta = [np.random.rand()*sigmaA[1]/2 - sigmaA[1] for t in range(3)] + [np.random.rand()*sigmaA[0] - sigmaA[0]/2 for r in range(3)] 
-        # ta = [np.random.rand()*sigmaA[1] for t in range(3)] + [np.random.rand()*sigmaA[0] for r in range(3)] 
-        # ta = [np.random.randn()*sigmaA[1] for t in range(3)] + [np.random.randn()*sigmaA[0] for r in range(3)]
-        # ta = [np.random.normal(0,sigmaA[1]) for t in range(3)] + [np.random.normal(0,sigmaA[0]) for r in range(3)]
-        # ta = [randSign()*np.random.beta(2,4)*sigmaA[1] for t in range(3)] + [randSign()*np.random.beta(2,4)*sigmaA[0] for r in range(3)]
-        aN = H_Pose(ta)
-        # return np.dot(A_n,aN)
-        return np.dot(aN,A_n)
-    if ret_noise and (sigmaB != (0,0)):
-        return A_n,[Re,te]
-    else:
-        return A_n
-
-# def noiseX(A, sigma=(0,0)):
-#     Hcg = groundTruth(Hx)
-
-#     A_n = A
-#     if(sigma != (0,0)):
-#         tP = [np.random.rand()*sigma[1] - sigma[1]/2 for t in range(3)] + [np.random.rand()*sigma[0] - sigma[0]/2 for r in range(3)]
-#         # tP = [randSign()*np.random.rand()*sigma[1] for t in range(3)] + [randSign()*np.random.rand()*sigma[0] for r in range(3)]
-#         # tP = [np.random.randn()*sigma[1] for t in range(3)] + [np.random.randn()*sigma[0] for r in range(3)]
-#         N = H_Pose(tP)
-#         # A_n = np.dot(A,N)                     #   total movement in A with noisy movement 
-#         A_n = np.dot(A,inv(N))                  # ORIGINAL
-
-#     return A_n
-
-def noiseX(A, sigma=(0,0)):
-    Hcg = groundTruth(Hx)
-
-    A_n = A
-    if(sigma != (0,0)):
-        tP = [np.random.rand()*sigma[1]/2 - sigma[1] for t in range(3)] + [np.random.rand()*sigma[0]/2 - sigma[0] for r in range(3)]
-        # tP = [randSign()*np.random.rand()*sigma[1] for t in range(3)] + [randSign()*np.random.rand()*sigma[0] for r in range(3)]
-        # tP = [np.random.randn()*sigma[1] for t in range(3)] + [np.random.randn()*sigma[0] for r in range(3)]
-        N = H_Pose(tP)
-        # A_n = np.dot(N,np.dot(A,N))                   #   total movement in A with noisy movement 
-        A_n = np.dot(A,inv(N))                  # ORIGINAL
-        # A_n = np.dot(A,N) 
-        # A_n = np.dot(N,A) 
-
-    return A_n
-
-def noiseX2(A, sigma=(0,0)):
-    Hcg = groundTruth(Hx)
-
-    A_n = A
-    if(sigma != (0,0)):
-        tP = [np.random.rand()*sigma[1]/2 - sigma[1] for t in range(3)] + [np.random.rand()*sigma[0]/2 - sigma[0] for r in range(3)]
-        # tP = [np.random.rand()*sigma[1] for t in range(3)] + [np.random.rand()*sigma[0] for r in range(3)]
-        # tP = [np.random.randn()*sigma[1] for t in range(3)] + [np.random.randn()*sigma[0] for r in range(3)]
-        N = H_Pose(tP)
-        A_n = np.dot(A,N)                     #   total movement in A with noisy movement     ORIGINAL
-        # A_n = np.dot(A,inv(N))
-        # A_n = np.dot(N,A)
-
-    return A_n
-
-I = np.eye(3)
